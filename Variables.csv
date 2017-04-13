@@ -1,0 +1,43 @@
+Use,Variable,Type,Description
+None,Player 1,,Name of player 1
+None,Player 2,,Name of player 2
+None,Result,Ordinal (0/1),Referenced on player 1. If player 1 wins- result=1 (FNL.1>FNL.2)
+Covariate,FSP.1,Real Number,First serve percentage for player 1
+Covariate,FSW.1,Real Number,First serve won by player 1
+Covariate,SSP.1,Real Number,Second serve percentage for player 1
+Covariate,SSW.1,Real Number,Second serve won by player 1
+Covariate,ACE.1,Numeric-Integer,Aces won by player 1
+Covariate,DBF.1,Numeric-Integer,Double faults committed by player 1
+None,WNR.1,Numeric,Winners earned by player 1
+None,UFE.1,Numeric,Unforced errors committed by player 1
+Covariate,BPC.1,Numeric,Break points created by player 1
+Covariate,BPW.1,Numeric,Break points won by player 1
+Covariate,NPA.1,Numeric,Net points attempted by player 1
+Covariate,NPW.1,Numeric,Net points won by player 1
+Covariate,TPW.1,Numeric,Total points won by player 1
+None,ST1.1,Numeric-Integer,Set 1 Result for player 1
+None,ST2.1,Numeric-Integer,Set 2 Result for player 1
+None,ST3.1,Numeric-Integer,Set 3 Result for player 1
+None,ST4.1,Numeric-Integer,Set 4 Result for player 1
+None,ST5.1,Numeric-Integer,Set 5 Result for player 1
+Response,FNL.1,Numeric-Integer,Final number of games won by player 1
+Covariate,FSP.1,Real Number,First serve percentage for player 2
+Covariate,FSW.2,Real Number,First serve won by player 2
+Covariate,SSP.2,Real Number,Second servce percentage for player 2
+Covariate,SSW.2,Real Number,Second serve won by player 2
+Covariate,ACE.2,Numeric-Integer,Aces won by player 2
+Covariate,DBF.2,Numeric-Integer,Double faults committed by player 2
+None,WNR.2,Numeric,Winners earned by player 2
+None,UFE.2,Numeric,Unforced errors committed by player 2
+Covariate,BPC.2,Numeric,Break points created by player 2
+Covariate,BPW.2,Numeric,Break points won by player 2
+Covariate,NPA.2,Numeric,Net points attempted by player 2
+Covariate,NPW.2,Numeric,Net points won by player 2
+Covariate,TPW.2,Numeric,Total points won by player 2
+None,ST2.1,Numeric-Integer,Set 1 Result for player 2
+None,ST2.2,Numeric-Integer,Set 2 Result for player 2
+None,ST2.3,Numeric-Integer,Set 3 Result for player 2
+None,ST2.4,Numeric-Integer,Set 4 Result for player 2
+None,ST2.5,Numeric-Integer,Set 5 Result for player 2
+None,FNL.2,Numeric-Integer,Final number of games won by player 2
+Covariate,Round,Numeric-Integer,Round of the tournament at which the game is played
