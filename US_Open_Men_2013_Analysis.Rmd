@@ -1,0 +1,371 @@
+---
+title: "US Open Men 2013 Analysis"
+output:
+
+  html_document: default
+date: "April 16, 2017"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<br>
+
+#### **Business Understanding**
+
+
+This is a public, multivariate dataset concerning the US Men's Tennis Open in 2013. Our data is sourced from UCI Machine Learning Repository (Jauhari, Morankar, Fokoue)
+
+> (https://archive.ics.uci.edu/ml/datasets/Tennis+Major+Tournament+Match+Statistics).  
+
+<br>
+
+It has 42 variables in all. Each observation represents a singles tennis match.  
+
+<br>
+
+In tennis, a match is composed of two to three sets. To win a match, a player must win two sets. A set is composed of at least six games. To win a set, one must win at least six games, with a two game advantage over the games won by the opposing player. The scoring of games in tennis is a little odd. The score begins 0-0 or "love." After the first point is scored, the score is "love"-15. The scoring continues sequentially, "love"(0 points), 15(2 points), 30(3 points), 40(4 points). The game must be won by two points. If the score is 40-40, that is called 40-all or "deuce," the one player must score an additional two points consecutively to win the game. 
+
+<br>
+
+The response variable which we will be attempting to predict will by FNL.1 (the final number of games won by player 1). In predicting this variable, some other variables become obsolete such as Result and STX.Y. Four other variables that we will not include in our analysis are WNR.X and UFE.X as no data populates those fields. Below is the complete list of variables and their uses.
+
+<br>
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library("knitr")
+variables<-read.csv("Variables.csv")
+kable(variables)
+```
+
+
+<br><br>
+
+
+#### **Data Understanding**
+
+* We will use `dim` function to get the dimensions of the data
+* `str` function to get the variable information
+* `head` function to read first few observations
+* `summary` function to get a summary of the data set
+
+```{r}
+usopen <- read.csv("USOpen-men-2013.csv")
+dim(usopen)
+str(usopen)
+head(usopen)
+summary(usopen)
+```
+
+<br>
+
+* Summary statistics
+    + There are 126 observations with 42 varaibles
+    + We read first few observations from the data set
+    + WNR.1, WNR.2,	UFE.2 and	UFE.1 variables have no data
+    + There are missing observations for ST4.1, ST5.1, NPA.2, NPW.2, ST3.2,	ST4.2 and	ST5.2 variables
+
+
+<br>
+
+
+
+```{r echo=FALSE}
+attach(usopen)
+```
+
+* We use `hist` function to plot the histograms
+* We use `plot` function to plot the density function
+* As the varaibles are larger in number we avoid scatter plots at this moment
+
+```{r}
+#Histograms
+par(mfrow=c(3,5))
+hist(Round, col="blue",xlab="Round")
+hist(FNL1, col="blue",xlab="FNL1")
+hist(FSP.1, col="blue",xlab="FSP.1")
+hist(FSW.1, col="blue",xlab="FSW.1")
+hist(SSP.1, col="blue",xlab="SSP.1")
+hist(SSW.1, col="blue",xlab="SSW.1")
+hist(ACE.1, col="blue",xlab="ACE.1")
+hist(DBF.1, col="blue",xlab="DBF.1")
+hist(BPC.1, col="blue",xlab="BPC.1")
+hist(BPW.1, col="blue",xlab="BPW.1")
+hist(NPA.1, col="blue",xlab="NPA.1")
+hist(NPW.1, col="blue",xlab="NPW.1")
+hist(TPW.1, col="blue",xlab="TPW.1")
+hist(FSP.2, col="blue",xlab="FSP.2")
+hist(FSW.2, col="blue",xlab="FSW.2")
+par(mfrow=c(3,5))
+hist(SSP.2, col="blue",xlab="SSP.2")
+hist(SSW.2, col="blue",xlab="SSW.2")
+hist(ACE.2, col="blue",xlab="ACE.2")
+hist(DBF.2, col="blue",xlab="DBF.2")
+hist(BPC.2, col="blue",xlab="BPC.2")
+hist(BPW.2, col="blue",xlab="BPW.2")
+hist(NPA.2, col="blue",xlab="NPA.2")
+hist(NPW.2, col="blue",xlab="NPW.2")
+hist(TPW.2, col="blue",xlab="TPW.2")
+
+#Density Plot
+par(mfrow=c(3,5))
+plot(density(Round), col="blue",xlab="Round")
+plot(density(FNL1), col="blue",xlab="FNL1")
+plot(density(FSP.1), col="blue",xlab="FSP.1")
+plot(density(FSW.1), col="blue",xlab="FSW.1")
+plot(density(SSP.1), col="blue",xlab="SSP.1")
+plot(density(SSW.1), col="blue",xlab="SSW.1")
+plot(density(ACE.1), col="blue",xlab="ACE.1")
+plot(density(DBF.1), col="blue",xlab="DBF.1")
+plot(density(BPC.1), col="blue",xlab="BPC.1")
+plot(density(BPW.1), col="blue",xlab="BPW.1")
+plot(density(NPA.1,na.rm=T), col="blue",xlab="NPA.1")
+plot(density(NPW.1,na.rm=T), col="blue",xlab="NPW.1")
+plot(density(TPW.1), col="blue",xlab="TPW.1")
+plot(density(FSP.2), col="blue",xlab="FSP.2")
+plot(density(FSW.2), col="blue",xlab="FSW.2")
+par(mfrow=c(3,5))
+plot(density(SSP.2), col="blue",xlab="SSP.2")
+plot(density(SSW.2), col="blue",xlab="SSW.2")
+plot(density(ACE.2), col="blue",xlab="ACE.2")
+plot(density(DBF.2), col="blue",xlab="DBF.2")
+plot(density(BPC.2), col="blue",xlab="BPC.2")
+plot(density(BPW.2), col="blue",xlab="BPW.2")
+plot(density(NPA.2,na.rm=T), col="blue",xlab="NPA.2")
+plot(density(NPW.2,na.rm=T), col="blue",xlab="NPW.2")
+```
+
+```{r echo=FALSE,eval=FALSE}
+#Scatter Plot
+pairs(
+  ~ Round + FNL1 + FSP.1 + FSW.1 + SSP.1 + SSW.1 + ACE.1 + DBF.1 + BPC.1 +
+    BPW.1 + NPA.1 + NPW.1 + TPW.1 + FSP.2 + FSW.2 + SSP.2 + SSW.2 + ACE.2 +
+    DBF.2 + BPC.2 + BPW.2 + NPA.2 + NPW.2 + TPW.2
+)
+```
+
+
+*	Most of the data is numeric with little or no cleaning required. We can replace the missing values with zero (or mean value) to simplify the data modeling process.
+
+
+
+<br><br>
+
+
+#### **Data Preparation**
+
+*	We will not consider the variable Round as it is a constant and is not impacting the response or regressor variables as evident from the scatter plots
+
+* We have chosen the response variable as FNL1 - Final number of games won by player 1
+* Covariates for consideration -  FSP.1, FSW.1, SSP.1, SSW.1, ACE.1, DBF.1, BPC.1, BPW.1, NPA.1, NPW.1, TPW.1, FSP.2, FSW.2, SSP.2, SSW.2, ACE.2, DBF.2, BPC.2, BPW.2, NPA.2, NPW.2, TPW.2
+
+* We observe NA values in NPA and NPW variables and replace them with 0
+
+```{r}
+usopen$NPA.1[is.na(usopen$NPA.1)] <- 0
+usopen$NPW.1[is.na(usopen$NPW.1)] <- 0
+usopen$NPW.2[is.na(usopen$NPW.2)] <- 0
+usopen$NPA.2[is.na(usopen$NPA.2)] <- 0
+```
+
+* Rest of the data looks pretty clean
+
+<br><br>
+
+
+#### **Modeling**
+
+* We will utilize multiple linear regression method for this model.
+* Based on the correlation matrix and partial f tests we will	decide on the final list of covariates and final number of observations 
+
+* Correlation martix for the selected covariates
+```{r}
+cor(usopen[, c(
+  "FSP.1",
+  "FSW.1",
+  "SSP.1",
+  "SSW.1",
+  "ACE.1",
+  "DBF.1",
+  "BPC.1",
+  "BPW.1",
+  "NPA.1",
+  "NPW.1",
+  "TPW.1",
+  "FSP.2",
+  "FSW.2",
+  "SSP.2",
+  "SSW.2",
+  "ACE.2",
+  "DBF.2",
+  "BPC.2",
+  "BPW.2",
+  "NPA.2",
+  "NPW.2",
+  "TPW.2"
+)])
+```
+
+* We observe high correlation between NPA.1 and NPW.1, TPW.1 and FSW.1,NPA.2 and NPW.2, FSW.2 and TPW.2
+* Other combinations of variables are also correlated
+* There is a good probability that we may experience multicollinearity in our model
+
+
+
+* We split the data set into testing (30%) and training data (70%)
+
+```{r}
+# setting the seed to make the partition reproductible
+set.seed(999)
+index <-
+  sample(seq_len(nrow(usopen)), size = floor(0.70 * nrow(usopen)))
+
+usopen_train <- usopen[index,]
+usopen_test <- usopen[-index, ]
+```
+
+
+*	We now create model based on training data
+* `summary` function is used to get the model details
+
+    
+```{r}
+model_usopen <-
+  lm(
+    FNL1 ~ FSP.1 + FSW.1 + SSP.1 + SSW.1 + ACE.1 + DBF.1 + BPC.1 + BPW.1 + NPA.1 +
+      NPW.1 + TPW.1 + FSP.2 + FSW.2 + SSP.2 + SSW.2 + ACE.2 + DBF.2 + BPC.2 +
+      BPW.2 + NPA.2 + NPW.2 + TPW.2,
+    data = usopen_train
+  )
+summary(model_usopen)
+```
+    
+
+
+
+* The null hypothesis is <br> $H_0: \beta_1=\beta_2=...=\beta_p=0$
+
+* That is, there is not a single predictor which can be considered statistically significant
+
+* The alternate hypothesis is <br>
+$H_a:$ At least one $\beta_j$ is not zero
+
+* That is, there is at least predictor which can explain the change in resultant variable
+
+* We reject null hypothesis when the p value is < 0.05
+    
+*	From the model summary we observe that there are only 2 statisticallly significant variables (null hypothesis is rejected for these)
+    + TPW.1
+    + TPW.2
+
+* The F-statistic is 24.93 and the corresponding p-value is significantly lower than 0.05 so we can conclude to reject that null hypothesis that no predictor varaible explains the variability in the response variable 
+
+* The $R^{2}$ value is 0.8815
+
+* The model explains 88.15% of the varaibility in FNL1
+
+* We now do a partial f-test for the variables FSP.1, FSW.1, SSP.1, SSW.1, ACE.1, DBF.1, NPA.1, NPW.1, FSP.2, FSW.2, SSP.2, SSW.2, ACE.2, DBF.2, NPA.2, NPW.2 and BPC.2
+
+```{r}
+model_usopen_p <-
+  lm(FNL1 ~  BPC.1 + BPW.1 + TPW.1 + BPW.2 + TPW.2,
+     data = usopen_train)
+anova(model_usopen, model_usopen_p)
+```
+
+* We observe that p value is > 0.05 and therefore all these variables are not statistically significant
+* We can now exclude these variables from our analysis
+* We summarize our current model
+
+```{r}
+summary(model_usopen_p)
+```
+
+* We run another partial f-test for the variable BPW.2
+
+```{r}
+model_usopen_p_2 <-
+  lm(FNL1 ~ BPC.1 +  BPW.1 + TPW.1 +  TPW.2,
+     data = usopen_train)
+anova(model_usopen_p, model_usopen_p_2)
+```
+
+* We again get a p-value > 0.05
+* Hence BPW.2 is also not statistically significant
+* We summarize our current model
+
+```{r}
+summary(model_usopen_p_2)
+```
+
+
+* We now standardize the regression coefficients using unit normal scaling
+
+```{r}
+usopen_train_standard = as.data.frame(apply(usopen_train[, c("FNL1", "BPC.1", "BPW.1", "TPW.1", "TPW.2")], 2, function(x) {
+  (x - mean(x)) / sd(x)
+}))
+```
+
+* We now create the new model using standardized values
+
+```{r}
+model_usopen_std <-
+  lm(FNL1 ~ BPC.1 +  BPW.1 + TPW.1 +  TPW.2,
+     data = usopen_train_standard)
+summary(model_usopen_std)
+```
+
+* To better visualize the coefficients we plot the `barplot`
+
+```{r}
+barplot(model_usopen_std$coefficients)
+```
+
+* We observe that the most statistically significant variables are TPW.1 and TPW.2
+
+* We check our model for multicolllinearity
+* We will the `vif` function from `car` library to examine multicollinearity
+
+```{r warning=FALSE}
+library(car)
+vif(model_usopen_std)
+```
+
+* We observe that there is multicollinearity in our model (as was expected)
+* We find the colleration matrix of the variables
+
+
+```{r}
+cor(usopen_train_standard[, c("FNL1",
+                              "BPC.1",
+                              "BPW.1",
+                              "TPW.1",
+                              "TPW.2")])
+```
+
+* Since TPW.1 and TPW.2 are highly correlated, we keep only TPW.1 and recreate the model
+
+<br><br>
+
+
+#### **Evaluation**
+
+Residual analysis
+*	Run testing data on ModelX
+    +	What is the error between predicted and fitted 
+    +	What is the success % of our model 
+
+*	Multicollinearity is evident in this dataset as multiple covariates will impact each other by nature. For example, STX.Y will build up to FNL.X. As all observations are within the sphere of one match, most varibales will have some correlation to each other.
+* We would also check for nonlinearity by comparing residual and fitted values
+
+*	Multicollinearity could be countered by collecting more data (not an option in this case as this is historical data), specifying the model differently (removing some covariates), or using Ridge Regression
+* We plan on analyzing the residual plots and then select a fitting transformation for a better model
+
+```{r echo=FALSE}
+detach(usopen)
+```
+
+
+<br><br>
