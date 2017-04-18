@@ -30,12 +30,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 * Due to the nature of our data, we assumed early on that multicollinearity would be an issue. We found, using Variance Inflation Factors (VIF), that TPW.1 and TPW.2 were correlated. Outside of the data, this makes sense as the more points player one wins, the more points player two will no win. Also, both final points for the players will increase due to the nature of a tennis game. To adjust for this multicollinearity, we removed TPW.1 from the model. 
 
-* Our final model, **FNL1= 6.722e-01 BPC.1 + 1.892e-01 TPW.2** , suggests that
-	As the number of break points created by player 1 increases by 1, the final number of games won by player 1 XXXXXX
-	As the number of break points won by player 1 increases by 1, the final number of games won by player 1 XXXXXX
-	As player 2's total number of points increases by 1, the final number of games won by player 1 XXXXXX
+* Our final model, **FNL1= 0.6722 BPC.1 + 0.1892 TPW.1** , suggests that
+	As the number of break points created by player 1 increases by 1, the final number of games won by player 1 0.6722
+	As player 2's total number of points increases by 1, the final number of games won by player 1 0.1892
 
-* After our model was built, we applied our testing data to the model..
+* After our final model was built, we applied it to the testing data. The testing data was originally partitioned as 30% of the original data prior to the model building. The data was tested using the three iterations of the model we created. The Mean Squared Error of the predicted values versus the actual values of the testing data was determined. As we refined our model to the final two variables of BPC.1(break points created for player one) and TPW.1(total points won by player one) the MSE reached a low point.
+
+* In conclusion, predicting the outcome of a tennis match based on the provided variables will be highly uncertain. We would suggest collecting more data about player's statistics (such as player 1 age, titles, etc) in an attempt to further refine a model for prediction.
 
 <br>
 
@@ -84,8 +85,14 @@ kable(variables)
 ```{r}
 usopen <- read.csv("USOpen-men-2013.csv")
 dim(usopen)
+```
+
+```{r eval=FALSE}
 str(usopen)
 head(usopen)
+```
+
+```{r}
 summary(usopen)
 ```
 
@@ -432,7 +439,6 @@ mean((t - usopen_test[, c("FNL1")]) ** 2)
 ```{r echo=FALSE}
 detach(usopen)
 ```
-
 
 
 <br><br>
