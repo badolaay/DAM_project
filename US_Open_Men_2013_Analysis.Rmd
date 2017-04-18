@@ -1,8 +1,12 @@
 ---
 title: "US Open Men 2013 Analysis"
 output:
-  pdf_document: default
-  html_document: default
+  pdf_document:
+    toc: true
+    toc_depth: 3
+  html_document:
+    toc: true
+    toc_depth: 3
 date: "April 16, 2017"
 ---
 
@@ -12,7 +16,26 @@ knitr::opts_chunk$set(echo = TRUE)
 
 <br>
 
-#### **Business Understanding**
+# Summary
+
+* Predicting the results of sporting matches is complicated business. Factors that cannot be captured by data such as crowd enthusiasm, home field advantage, and rivalries do exist and have an impact on the outcome.  
+
+* We began our analysis of the 2013 US Men's Open with 42 variables broken into one response variables, 18 un-useful variables, 1 un-useful categorical variable and 23 possible covariates. Breaking the data 70/30 into training and testing data, we developed a prediction model utilizing 22 covariates to predict the Final Games Won for Player 1. This model had an R^2 of 88.15% and an Adjusted R^2 of 84.62%--there was someone work to be done in slimming the number of predictor variables. 
+
+* Through Partial F Testing, we eliminated 17 variables from our model to be left with BCP.1(break points created by player 1), BPW.1(break points won by player 1), TPW.1(total points won by player 1), TPW.2(total points won by player 2).
+
+* Due to the nature of our data, we assumed early on that multicollinearity would be an issue. We found, using Variance Inflation Factors (VIF), that TPW.1 and TPW.2 were correlated. Outside of the data, this makes sense as the more points player one wins, the more points player two will no win. Also, both final points for the players will increase due to the nature of a tennis game. To adjust for this multicollinearity, we removed TPW.1 from the model. 
+
+* Our final model, **FNL1= 6.722e-01 BPC.1 + 1.892e-01 TPW.2** , suggests that
+	As the number of break points created by player 1 increases by 1, the final number of games won by player 1 XXXXXX
+	As the number of break points won by player 1 increases by 1, the final number of games won by player 1 XXXXXX
+	As player 2's total number of points increases by 1, the final number of games won by player 1 XXXXXX
+
+* After our model was built, we applied our testing data to the model..
+
+<br>
+
+# **Business Understanding**
 
 
 This is a public, multivariate dataset concerning the US Men's Tennis Open in 2013. Our data is sourced from UCI Machine Learning Repository (Jauhari, Morankar, Fokoue)
@@ -33,6 +56,8 @@ The response variable which we will be attempting to predict will by FNL.1 (the 
 
 <br>
 
+## Variables in the data set
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 library("knitr")
 variables<-read.csv("Variables.csv")
@@ -43,12 +68,14 @@ kable(variables)
 <br><br>
 
 
-#### **Data Understanding**
+# **Data Understanding**
 
 * We will use `dim` function to get the dimensions of the data
 * `str` function to get the variable information
 * `head` function to read first few observations
 * `summary` function to get a summary of the data set
+
+## Data set summary
 
 ```{r}
 usopen <- read.csv("USOpen-men-2013.csv")
@@ -78,6 +105,8 @@ attach(usopen)
 * We use `hist` function to plot the histograms
 * We use `plot` function to plot the density function
 * As the varaibles are larger in number we avoid scatter plots at this moment
+
+## Plots
 
 ```{r}
 #Histograms
@@ -153,7 +182,7 @@ pairs(
 <br><br>
 
 
-#### **Data Preparation**
+# **Data Preparation**
 
 *	We will not consider the variable Round as it is a constant and is not impacting the response or regressor variables as evident from the scatter plots
 
@@ -174,12 +203,13 @@ usopen$NPA.2[is.na(usopen$NPA.2)] <- 0
 <br><br>
 
 
-#### **Modeling**
+# **Modeling**
 
 * We will utilize multiple linear regression method for this model.
 * Based on the correlation matrix and partial f tests we will	decide on the final list of covariates and final number of observations 
 
-* Correlation martix for the selected covariates
+## Correlation martix for selected covariates
+
 ```{r eval=FALSE}
 cor(usopen[, c(  "FSP.1",  "FSW.1",  "SSP.1",  "SSW.1",  "ACE.1",  "DBF.1",  "BPC.1",  "BPW.1",
   "NPA.1",  "NPW.1",  "TPW.1",  "FSP.2",  "FSW.2",  "SSP.2",  "SSW.2",  "ACE.2",  "DBF.2",  "BPC.2",
@@ -195,6 +225,8 @@ cor(usopen[, c(  "FSP.1",  "FSW.1",  "SSP.1",  "SSW.1",  "ACE.1",  "DBF.1",  "BP
 
 * We split the data set into testing (30%) and training data (70%)
 
+## Data split
+
 ```{r}
 # setting the seed to make the partition reproductible
 set.seed(999)
@@ -209,6 +241,7 @@ usopen_test <- usopen[-index, ]
 *	We now create model based on training data
 * `summary` function is used to get the model details
 
+## Model details
     
 ```{r}
 model_usopen <-
@@ -245,6 +278,8 @@ $H_a:$ At least one $\beta_j$ is not zero
 
 * The model explains 88.15% of the varaibility in FNL1
 
+## Partial F tests
+
 * We now do a partial f-test for the variables FSP.1, FSW.1, SSP.1, SSW.1, ACE.1, DBF.1, NPA.1, NPW.1, FSP.2, FSW.2, SSP.2, SSW.2, ACE.2, DBF.2, NPA.2, NPW.2 and BPC.2
 
 ```{r}
@@ -279,6 +314,7 @@ anova(model_usopen_p, model_usopen_p_2)
 summary(model_usopen_p_2)
 ```
 
+## Standardize the covariate coefficients
 
 * We now standardize the regression coefficients using unit normal scaling
 
@@ -304,6 +340,8 @@ barplot(model_usopen_std$coefficients)
 ```
 
 * We observe that the most statistically significant variables are TPW.1 and TPW.2
+
+## Multicollinearity checks
 
 * We check our model for multicolllinearity
 * We will the `vif` function from `car` library to examine multicollinearity
@@ -369,7 +407,7 @@ plot(model_usopen_std_2p)
 <br><br>
 
 
-#### **Evaluation**
+# **Evaluation**
 
 * We calculate the mean square error for the models created
 
@@ -390,6 +428,7 @@ mean((t - usopen_test[, c("FNL1")]) ** 2)
 ```{r echo=FALSE}
 detach(usopen)
 ```
+
 
 
 <br><br>
