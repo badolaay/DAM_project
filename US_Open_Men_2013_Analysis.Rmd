@@ -1,8 +1,8 @@
 ---
 title: "US Open Men 2013 Analysis"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 date: "April 16, 2017"
 ---
 
@@ -180,30 +180,10 @@ usopen$NPA.2[is.na(usopen$NPA.2)] <- 0
 * Based on the correlation matrix and partial f tests we will	decide on the final list of covariates and final number of observations 
 
 * Correlation martix for the selected covariates
-```{r}
-cor(usopen[, c(
-  "FSP.1",
-  "FSW.1",
-  "SSP.1",
-  "SSW.1",
-  "ACE.1",
-  "DBF.1",
-  "BPC.1",
-  "BPW.1",
-  "NPA.1",
-  "NPW.1",
-  "TPW.1",
-  "FSP.2",
-  "FSW.2",
-  "SSP.2",
-  "SSW.2",
-  "ACE.2",
-  "DBF.2",
-  "BPC.2",
-  "BPW.2",
-  "NPA.2",
-  "NPW.2",
-  "TPW.2"
+```{r eval=FALSE}
+cor(usopen[, c(  "FSP.1",  "FSW.1",  "SSP.1",  "SSW.1",  "ACE.1",  "DBF.1",  "BPC.1",  "BPW.1",
+  "NPA.1",  "NPW.1",  "TPW.1",  "FSP.2",  "FSW.2",  "SSP.2",  "SSW.2",  "ACE.2",  "DBF.2",  "BPC.2",
+  "BPW.2",  "NPA.2",  "NPW.2",  "TPW.2"
 )])
 ```
 
@@ -338,30 +318,74 @@ vif(model_usopen_std)
 
 
 ```{r}
-cor(usopen_train_standard[, c("FNL1",
-                              "BPC.1",
-                              "BPW.1",
-                              "TPW.1",
-                              "TPW.2")])
+cor(usopen_train_standard[, c("FNL1", "BPC.1", "BPW.1", "TPW.1", "TPW.2")])
 ```
 
 * Since TPW.1 and TPW.2 are highly correlated, we keep only TPW.1 and recreate the model
+
+```{r warning=FALSE}
+model_usopen_std_2 <-
+  lm(FNL1 ~ BPC.1 +  BPW.1 + TPW.1 ,
+     data = usopen_train_standard)
+summary(model_usopen_std_2)
+```
+
+* We now calculate the VIF to check for multicollinearity
+
+```{r}
+library(car)
+vif(model_usopen_std_2)
+```
+
+* There is no multicolinearity on this model
+
+* As there is one statistically insignificant variable in this model, we run partial F test again for the variable BPW.1
+
+```{r}
+model_usopen_std_2p <-
+  lm(FNL1 ~ BPC.1 +   TPW.1 ,
+     data = usopen_train_standard)
+summary(model_usopen_std_2p)
+library(car)
+vif(model_usopen_std_2p)
+```
+
+* This model does not have multicollinearity
+
+```{r}
+anova(model_usopen_std_2, model_usopen_std_2p)
+```
+
+* Using `anova` function we arrive to the conclusion that the vairable BPW.1 is not statistically significant
+
+
+* We now do the residual plots
+
+```{r}
+par(mfrow = c(2, 2))
+plot(model_usopen_std_2p)
+```
 
 <br><br>
 
 
 #### **Evaluation**
 
-Residual analysis
-*	Run testing data on ModelX
-    +	What is the error between predicted and fitted 
-    +	What is the success % of our model 
+* We calculate the mean square error for the models created
 
-*	Multicollinearity is evident in this dataset as multiple covariates will impact each other by nature. For example, STX.Y will build up to FNL.X. As all observations are within the sphere of one match, most varibales will have some correlation to each other.
-* We would also check for nonlinearity by comparing residual and fitted values
+```{r}
+t <- predict(model_usopen_std, usopen_test)
+mean((t - usopen_test[, c("FNL1")]) ** 2)
 
-*	Multicollinearity could be countered by collecting more data (not an option in this case as this is historical data), specifying the model differently (removing some covariates), or using Ridge Regression
-* We plan on analyzing the residual plots and then select a fitting transformation for a better model
+t <- predict(model_usopen_std_2, usopen_test)
+mean((t - usopen_test[, c("FNL1")]) ** 2)
+
+t <- predict(model_usopen_std_2p, usopen_test)
+mean((t - usopen_test[, c("FNL1")]) ** 2)
+```
+
+* We observe that as we proceeded to refine our model the MSE kept on decreasing
+* And we have the least MSE in our final model
 
 ```{r echo=FALSE}
 detach(usopen)
